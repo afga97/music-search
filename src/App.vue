@@ -1,36 +1,56 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
+    <h1> Mi aplicación de música </h1>
+    <select name="" id="" v-model="selectedCountry"> 
+      <option v-for="country in countries" v-bind:value="country.value"> {{ country.name }}</option>
+    </select>
     <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
+      <artist v-for="artist in artists" v-bind:artist="artist" v-bind:key="artist.mbid" class="others"></artist>
     </ul>
   </div>
 </template>
 
 <script>
+import artist from './components/artist.vue'
+import getArtist from './api'
+
 export default {
   name: 'app',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      artists: [],
+      countries : [
+        {name: 'Colombia', value:'colombia'},
+        {name: 'Argentina', value:'argentina'},
+      ],
+      selectedCountry:"colombia"
+    }
+  },
+  components: {
+    artist
+  },
+  methods: {
+    refreshArtists(){
+      const self = this
+        getArtist(this.selectedCountry)
+          .then( function(response){
+            self.artists = response
+        })
+    }
+  },
+  mounted() {
+    this.refreshArtists()
+  },
+  watch:{
+    selectedCountry: function(){
+      this.refreshArtists()
     }
   }
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 #app
   font-family 'Avenir', Helvetica, Arial, sans-serif
   -webkit-font-smoothing antialiased
@@ -52,4 +72,5 @@ li
 
 a
   color #42b983
+    
 </style>
